@@ -171,6 +171,20 @@ impl Container {
             .map(|_| ())
     }}
 
+    api_doc! { Container => Resize
+    |
+    /// Resize the TTY for a container
+    pub async fn resize(&self, width: u16, height: u16) -> Result<()> {
+        self.docker
+            .post_string(
+                &format!("/containers/{}/resize?w={width}&h={height}", self.id),
+                Payload::empty(),
+                Headers::none()
+            )
+            .await
+            .map(|_| ())
+    }}
+
     api_doc! { Container => Pause
     |
     /// Pause the container instance.

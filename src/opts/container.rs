@@ -524,6 +524,11 @@ impl ContainerCreateOptsBuilder {
         security_options => "HostConfig.SecurityOpt"
     );
 
+    impl_field!(
+        /// Mount the container's root filesystem as read only.
+        readonly_rootfs: bool => "HostConfig.ReadonlyRootfs"
+    );  
+
     impl_vec_field!(
         /// Specify any bind mounts, taking the form of `/some/host/path:/some/container/path`
         volumes => "HostConfig.Binds"

@@ -16,10 +16,7 @@ async fn docker_info() {
         _ => gethostname::gethostname().into_string().unwrap(),
     };
 
-    assert_eq!(
-        info_data.name.unwrap(),
-        hostname
-    );
+    assert_eq!(info_data.name.unwrap(), hostname);
 }
 
 #[tokio::test]

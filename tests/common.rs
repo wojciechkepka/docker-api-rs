@@ -3,12 +3,12 @@
 use std::env;
 use std::path::PathBuf;
 
+#[cfg(test)]
+pub use docker_api::conn;
 pub use docker_api::{api, models, models::ImageBuildChunk, opts, Docker};
 pub use futures_util::StreamExt;
 #[cfg(test)]
 pub use futures_util::TryStreamExt;
-#[cfg(test)]
-pub use docker_api::conn;
 pub use tempfile::TempDir;
 
 pub const DEFAULT_IMAGE: &str = "ubuntu:latest";

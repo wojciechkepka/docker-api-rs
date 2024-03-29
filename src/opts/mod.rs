@@ -149,7 +149,10 @@ mod tests {
         assert!(serialized.contains("tail=all"));
         assert!(serialized.contains("since=2147483647"));
 
-        let options = LogsOptsBuilder::default().n_lines(5).until(&timestamp).build();
+        let options = LogsOptsBuilder::default()
+            .n_lines(5)
+            .until(&timestamp)
+            .build();
 
         let serialized = options.serialize().unwrap();
 

@@ -508,7 +508,9 @@ async fn container_top() {
 
     let top_result = container.top(None).await;
     assert!(top_result.is_ok());
-    assert!(top_result.unwrap().processes.unwrap_or_default()[0][0].contains(&DEFAULT_CMD.to_string()));
+    assert!(
+        top_result.unwrap().processes.unwrap_or_default()[0][0].contains(&DEFAULT_CMD.to_string())
+    );
 
     cleanup_container(&docker, container_name).await;
 }

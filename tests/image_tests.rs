@@ -92,7 +92,8 @@ async fn image_tag() {
         .expect("image inspect data")
         .repo_tags
         .expect("repo tags")
-        .iter().any(|tag| tag.contains(&new_tag)));
+        .iter()
+        .any(|tag| tag.contains(&new_tag)));
 
     //cleanup
     let _ = image.delete().await;

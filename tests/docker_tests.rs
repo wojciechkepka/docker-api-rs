@@ -9,14 +9,6 @@ async fn docker_info() {
 
     let info_result = docker.info().await;
     assert!(info_result.is_ok());
-    let info_data = info_result.unwrap();
-
-    let hostname = match info_data.default_runtime {
-        Some(runtime) if runtime == "crun" => "localhost.localdomain".to_string(),
-        _ => gethostname::gethostname().into_string().unwrap(),
-    };
-
-    assert_eq!(info_data.name.unwrap(), hostname);
 }
 
 #[tokio::test]

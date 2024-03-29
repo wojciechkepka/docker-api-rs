@@ -527,7 +527,7 @@ impl ContainerCreateOptsBuilder {
     impl_field!(
         /// Mount the container's root filesystem as read only.
         readonly_rootfs: bool => "HostConfig.ReadonlyRootfs"
-    );  
+    );
 
     impl_vec_field!(
         /// Specify any bind mounts, taking the form of `/some/host/path:/some/container/path`
@@ -862,6 +862,13 @@ mod tests {
                 .auto_remove(true)
                 .privileged(true),
             r#"{"HostConfig":{"AutoRemove":true,"NetworkMode":"host","Privileged":true},"Image":"test_image"}"#
+        );
+
+        test_case!(
+            ContainerCreateOptsBuilder::default()
+                .image("test_image")
+                .readonly_rootfs(true),
+            r#"{"HostConfig":{"ReadonlyRootfs":true},"Image":"test_image"}"#
         );
 
         test_case!(

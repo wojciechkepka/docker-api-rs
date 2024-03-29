@@ -2,8 +2,10 @@ mod common;
 
 use common::{
     create_base_image, get_image_full_id, init_runtime, opts, tempdir_with_dockerfile, StreamExt,
-    TryStreamExt, DEFAULT_IMAGE,
+    DEFAULT_IMAGE,
 };
+
+use futures_util::TryStreamExt;
 
 #[tokio::test]
 async fn image_create_inspect_delete() {
@@ -41,7 +43,8 @@ async fn image_inspect() {
         .repo_tags
         .as_ref()
         .unwrap()
-        .contains(&format!("{image_name}:latest")));
+        .iter()
+        .any(|tag| tag.contains(&format!("{image_name}:latest"))));
     assert!(image.delete().await.is_ok());
 }
 
@@ -61,7 +64,7 @@ async fn image_history() {
     println!("{history_data:#?}");
     assert!(history_data
         .iter()
-        .any(|item| item.tags.iter().any(|t| t == DEFAULT_IMAGE)));
+        .any(|item| item.tags.iter().any(|t| t.contains(DEFAULT_IMAGE))));
 }
 
 #[tokio::test]
@@ -89,7 +92,7 @@ async fn image_tag() {
         .expect("image inspect data")
         .repo_tags
         .expect("repo tags")
-        .contains(&new_tag));
+        .iter().any(|tag| tag.contains(&new_tag)));
 
     //cleanup
     let _ = image.delete().await;

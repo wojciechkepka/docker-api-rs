@@ -47,5 +47,5 @@ jobs:
       - name: Test
         run: |
           docker pull ubuntu:latest
-          cargo test --all-features --all-targets
+          cargo test --all-features --all-targets -j1
           cargo test --doc

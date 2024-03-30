@@ -37,7 +37,9 @@ mod stream;
 pub mod conn {
     //! Connection related items
     pub(crate) use containers_api::conn::*;
-    pub use containers_api::conn::{Error, Transport, TtyChunk};
+    pub use containers_api::conn::{
+        tty::Multiplexer as TtyMultiplexer, Error, Transport, TtyChunk,
+    };
 }
 pub mod docker;
 pub mod errors;

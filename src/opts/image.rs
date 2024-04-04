@@ -314,7 +314,10 @@ impl ImageBuildOptsBuilder {
         cpu_quota: usize => "cpuquota"
     );
 
-    // TODO: buildargs
+    impl_map_field!(url
+        /// Set build-time variables.
+        build_args => "buildargs"
+    );
 
     impl_url_field!(
         /// Size of /dev/shm in bytes. The size must be greater than 0. If omitted the system uses 64MB.

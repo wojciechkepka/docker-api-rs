@@ -25,6 +25,30 @@ async fn image_create_inspect_delete() {
 }
 
 #[tokio::test]
+async fn image_create_with_build_args() {
+    let docker = init_runtime();
+
+    let image_name = "test-build-args-image";
+    let tmp = tempdir_with_dockerfile(None);
+    let opts = opts::ImageBuildOpts::builder(tmp.path())
+        .tag(image_name)
+        .build_args([("TEST_ARG", "test_value")])
+        .build();
+
+    let image = create_base_image(&docker, image_name, Some(opts)).await;
+
+    assert!(image.inspect().await.is_ok());
+    let inspect_data = image.inspect().await.expect("image inspect data");
+    assert!(inspect_data
+        .config
+        .expect("config element")
+        .env
+        .expect("environment")
+        .contains(&"TEST_ENV=test_value".to_string()));
+    assert!(image.delete().await.is_ok());
+}
+
+#[tokio::test]
 async fn image_inspect() {
     let docker = init_runtime();
     let images = docker.images();

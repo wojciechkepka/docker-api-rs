@@ -3,8 +3,12 @@
 use std::env;
 use std::path::PathBuf;
 
-pub use docker_api::{api, conn, models, models::ImageBuildChunk, opts, Docker};
-pub use futures_util::{StreamExt, TryStreamExt};
+#[allow(unused_imports)]
+pub use docker_api::conn;
+pub use docker_api::{api, models, models::ImageBuildChunk, opts, Docker};
+pub use futures_util::StreamExt;
+#[allow(unused_imports)]
+pub use futures_util::TryStreamExt;
 pub use tempfile::TempDir;
 
 pub const DEFAULT_IMAGE: &str = "ubuntu:latest";
@@ -22,9 +26,12 @@ pub fn init_runtime() -> Docker {
         #[cfg(unix)]
         {
             let uid = nix::unistd::Uid::effective();
+            let docker_user_sock = PathBuf::from(format!("/run/user/{uid}/docker.sock"));
             let docker_dir = PathBuf::from(format!("/run/user/{uid}/docker"));
             let docker_root_dir = PathBuf::from("/var/run");
-            if docker_dir.exists() {
+            if docker_user_sock.exists() {
+                Docker::unix(docker_user_sock)
+            } else if docker_dir.exists() {
                 Docker::unix(docker_dir.join("docker.sock"))
             } else if docker_root_dir.exists() {
                 Docker::unix(docker_root_dir.join("docker.sock"))
@@ -87,7 +94,12 @@ pub async fn get_container_full_id(docker: &Docker, name: &str) -> String {
 pub fn tempdir_with_dockerfile(content: Option<&str>) -> TempDir {
     let tmp = TempDir::new().expect("temp dir for image");
     let default_dockerfile = format!(
-        "FROM {DEFAULT_IMAGE}\nRUN echo 1234 > {TEST_IMAGE_PATH}\nRUN echo 321\nCMD sleep inf",
+        "FROM {DEFAULT_IMAGE}
+ARG TEST_ARG=\"\"
+RUN echo 1234 > {TEST_IMAGE_PATH}
+RUN echo 321
+ENV TEST_ENV=\"${{TEST_ARG}}\"
+CMD sleep inf",
     );
 
     std::fs::write(

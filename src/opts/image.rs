@@ -1,9 +1,9 @@
+use std::fmt::Display;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
     string::ToString,
 };
-use std::fmt::Display;
 
 use containers_api::opts::{Filter, FilterItem};
 use containers_api::url::encoded_pairs;

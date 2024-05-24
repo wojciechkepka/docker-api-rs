@@ -6,6 +6,7 @@ use containers_api::{
     impl_str_field, impl_url_bool_field, impl_url_str_field, impl_vec_field,
 };
 
+use std::fmt::{Display, Formatter};
 use std::net::SocketAddr;
 use std::{
     collections::HashMap,
@@ -15,7 +16,6 @@ use std::{
     string::ToString,
     time::Duration,
 };
-use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};

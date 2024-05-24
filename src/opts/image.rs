@@ -3,6 +3,7 @@ use std::{
     path::{Path, PathBuf},
     string::ToString,
 };
+use std::fmt::Display;
 
 use containers_api::opts::{Filter, FilterItem};
 use containers_api::url::encoded_pairs;
@@ -370,16 +371,17 @@ pub enum ImageName {
     Digest { image: String, digest: String },
 }
 
-impl ToString for ImageName {
-    fn to_string(&self) -> String {
-        match &self {
+impl Display for ImageName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
             ImageName::Tag { image, tag } => match tag {
                 Some(tag) => format!("{image}:{tag}"),
                 None => image.to_owned(),
             },
             ImageName::Id(id) => id.to_owned(),
             ImageName::Digest { image, digest } => format!("{image}@{digest}"),
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 

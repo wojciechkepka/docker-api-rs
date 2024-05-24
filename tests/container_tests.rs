@@ -691,7 +691,7 @@ async fn container_attach() {
 
     let _ = container.start().await;
 
-    let mut multiplexer = container.attach().await.unwrap();
+    let mut multiplexer = container.attach(false).await.unwrap();
     if let Some(chunk) = multiplexer.next().await {
         match chunk {
             Ok(TtyChunk::StdOut(chunk)) => {
@@ -726,7 +726,7 @@ async fn container_attach() {
 
     let _ = container.start().await;
 
-    let mut multiplexer = container.attach().await.unwrap();
+    let mut multiplexer = container.attach(false).await.unwrap();
     if let Some(chunk) = multiplexer.next().await {
         match chunk {
             Ok(TtyChunk::StdOut(chunk)) => {

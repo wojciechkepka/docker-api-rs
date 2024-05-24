@@ -15,6 +15,7 @@ use std::{
     string::ToString,
     time::Duration,
 };
+use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
@@ -331,9 +332,9 @@ impl FromStr for PublishPort {
     }
 }
 
-impl ToString for PublishPort {
-    fn to_string(&self) -> String {
-        format!("{}/{}", self.port, self.protocol.as_ref())
+impl Display for PublishPort {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.port, self.protocol.as_ref())
     }
 }
 
@@ -388,15 +389,16 @@ pub enum IpcMode {
     Host,
 }
 
-impl ToString for IpcMode {
-    fn to_string(&self) -> String {
-        match &self {
+impl Display for IpcMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
             IpcMode::None => String::from("none"),
             IpcMode::Private => String::from("private"),
             IpcMode::Shareable => String::from("shareable"),
             IpcMode::Container(id) => format!("container:{}", id),
             IpcMode::Host => String::from("host"),
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 
@@ -408,12 +410,13 @@ pub enum PidMode {
     Host,
 }
 
-impl ToString for PidMode {
-    fn to_string(&self) -> String {
-        match &self {
+impl Display for PidMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
             PidMode::Container(id) => format!("container:{}", id),
             PidMode::Host => String::from("host"),
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 

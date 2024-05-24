@@ -187,8 +187,7 @@ async fn network_connect_disconnect() {
         .unwrap()
         .networks
         .unwrap()
-        .get(network_name)
-        .is_some());
+        .contains_key(network_name));
 
     let _ = network.delete().await;
     let _ = container.delete().await;

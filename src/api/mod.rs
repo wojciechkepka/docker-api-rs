@@ -28,7 +28,7 @@ pub mod swarm;
 #[cfg_attr(docsrs, doc(cfg(feature = "swarm")))]
 pub mod task;
 
-pub use {container::*, exec::*, image::*, network::*, system::*, volume::*};
+pub use {container::*, exec::*, image::*, network::*, volume::*};
 
 #[cfg(feature = "swarm")]
 #[cfg_attr(docsrs, doc(cfg(feature = "swarm")))]

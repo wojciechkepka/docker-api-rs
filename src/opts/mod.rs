@@ -129,8 +129,7 @@ mod tests {
     #[cfg(feature = "chrono")]
     #[test]
     fn logs_options() {
-        let timestamp = chrono::NaiveDateTime::from_timestamp_opt(2_147_483_647, 0);
-        let since = chrono::DateTime::<chrono::Utc>::from_utc(timestamp.unwrap(), chrono::Utc);
+        let timestamp = chrono::DateTime::from_timestamp(2_147_483_647, 0).unwrap();
 
         let options = LogsOptsBuilder::default()
             .follow(true)
@@ -138,7 +137,7 @@ mod tests {
             .stderr(true)
             .timestamps(true)
             .all()
-            .since(&since)
+            .since(&timestamp)
             .build();
 
         let serialized = options.serialize().unwrap();
@@ -150,7 +149,10 @@ mod tests {
         assert!(serialized.contains("tail=all"));
         assert!(serialized.contains("since=2147483647"));
 
-        let options = LogsOptsBuilder::default().n_lines(5).until(&since).build();
+        let options = LogsOptsBuilder::default()
+            .n_lines(5)
+            .until(&timestamp)
+            .build();
 
         let serialized = options.serialize().unwrap();
 

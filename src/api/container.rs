@@ -47,13 +47,18 @@ impl Container {
     /// The [`TtyMultiplexer`](TtyMultiplexer) implements Stream for returning Stdout and Stderr chunks. It also implements [`AsyncWrite`](futures_util::io::AsyncWrite) for writing to Stdin.
     ///
     /// The multiplexer can be split into its read and write halves with the [`split`](TtyMultiplexer::split) method
-    pub async fn attach(&self) -> Result<tty::Multiplexer> {
+    pub async fn attach(&self, logs: bool) -> Result<tty::Multiplexer> {
         let inspect = self.inspect().await?;
+        let logs = if logs {
+                1
+            } else {
+                0
+            };
         let is_tty = inspect.config.and_then(|c| c.tty).unwrap_or_default();
         stream::attach(
             self.docker.clone(),
             format!(
-                "/containers/{}/attach?stream=1&stdout=1&stderr=1&stdin=1",
+                "/containers/{}/attach?stream=1&stdout=1&stderr=1&stdin=1&logs={logs}",
                 self.id
             ),
             Payload::empty(),
@@ -166,6 +171,20 @@ impl Container {
                 ),
                 Payload::empty(),
                 Headers::none(),
+            )
+            .await
+            .map(|_| ())
+    }}
+
+    api_doc! { Container => Resize
+    |
+    /// Resize the TTY for a container
+    pub async fn resize(&self, width: u16, height: u16) -> Result<()> {
+        self.docker
+            .post_string(
+                &format!("/containers/{}/resize?w={width}&h={height}", self.id),
+                Payload::empty(),
+                Headers::none()
             )
             .await
             .map(|_| ())

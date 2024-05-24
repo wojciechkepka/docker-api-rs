@@ -6,6 +6,7 @@ use containers_api::{
     impl_str_field, impl_url_bool_field, impl_url_str_field, impl_vec_field,
 };
 
+use std::fmt::{Display, Formatter};
 use std::net::SocketAddr;
 use std::{
     collections::HashMap,
@@ -331,9 +332,9 @@ impl FromStr for PublishPort {
     }
 }
 
-impl ToString for PublishPort {
-    fn to_string(&self) -> String {
-        format!("{}/{}", self.port, self.protocol.as_ref())
+impl Display for PublishPort {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.port, self.protocol.as_ref())
     }
 }
 
@@ -388,15 +389,16 @@ pub enum IpcMode {
     Host,
 }
 
-impl ToString for IpcMode {
-    fn to_string(&self) -> String {
-        match &self {
+impl Display for IpcMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
             IpcMode::None => String::from("none"),
             IpcMode::Private => String::from("private"),
             IpcMode::Shareable => String::from("shareable"),
             IpcMode::Container(id) => format!("container:{}", id),
             IpcMode::Host => String::from("host"),
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 
@@ -408,12 +410,13 @@ pub enum PidMode {
     Host,
 }
 
-impl ToString for PidMode {
-    fn to_string(&self) -> String {
-        match &self {
+impl Display for PidMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match &self {
             PidMode::Container(id) => format!("container:{}", id),
             PidMode::Host => String::from("host"),
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 
@@ -522,6 +525,11 @@ impl ContainerCreateOptsBuilder {
     impl_vec_field!(
         /// Specify a Vec of string values to customize labels for MLS systems, such as SELinux.
         security_options => "HostConfig.SecurityOpt"
+    );
+
+    impl_field!(
+        /// Mount the container's root filesystem as read only.
+        readonly_rootfs: bool => "HostConfig.ReadonlyRootfs"
     );
 
     impl_vec_field!(
@@ -857,6 +865,13 @@ mod tests {
                 .auto_remove(true)
                 .privileged(true),
             r#"{"HostConfig":{"AutoRemove":true,"NetworkMode":"host","Privileged":true},"Image":"test_image"}"#
+        );
+
+        test_case!(
+            ContainerCreateOptsBuilder::default()
+                .image("test_image")
+                .readonly_rootfs(true),
+            r#"{"HostConfig":{"ReadonlyRootfs":true},"Image":"test_image"}"#
         );
 
         test_case!(

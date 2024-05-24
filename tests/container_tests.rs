@@ -501,6 +501,13 @@ async fn container_stats() {
 async fn container_top() {
     let docker = init_runtime();
 
+    let version = docker.version().await.unwrap();
+    let is_podman = version
+        .components
+        .unwrap_or_default()
+        .iter()
+        .any(|component| component.name == "Podman Engine");
+
     let container_name = "test-top-container";
     let container = create_base_container(&docker, container_name, None).await;
 
@@ -508,7 +515,15 @@ async fn container_top() {
 
     let top_result = container.top(None).await;
     assert!(top_result.is_ok());
-    assert!(top_result.unwrap().processes.unwrap_or_default()[0].contains(&DEFAULT_CMD.to_string()));
+
+    if is_podman {
+        assert!(top_result.unwrap().processes.unwrap_or_default()[0][0]
+            .contains(&DEFAULT_CMD.to_string()));
+    } else {
+        assert!(
+            top_result.unwrap().processes.unwrap_or_default()[0].contains(&DEFAULT_CMD.to_string())
+        );
+    }
 
     cleanup_container(&docker, container_name).await;
 }
@@ -676,13 +691,12 @@ async fn container_attach() {
 
     let _ = container.start().await;
 
-    let mut multiplexer = container.attach().await.unwrap();
-    while let Some(chunk) = multiplexer.next().await {
+    let mut multiplexer = container.attach(false).await.unwrap();
+    if let Some(chunk) = multiplexer.next().await {
         match chunk {
             Ok(TtyChunk::StdOut(chunk)) => {
                 let logs = String::from_utf8_lossy(&chunk);
                 assert_eq!(logs, "123456\r\n");
-                break;
             }
             chunk => {
                 eprintln!("invalid chunk {chunk:?}");
@@ -712,13 +726,12 @@ async fn container_attach() {
 
     let _ = container.start().await;
 
-    let mut multiplexer = container.attach().await.unwrap();
-    while let Some(chunk) = multiplexer.next().await {
+    let mut multiplexer = container.attach(false).await.unwrap();
+    if let Some(chunk) = multiplexer.next().await {
         match chunk {
             Ok(TtyChunk::StdOut(chunk)) => {
                 let logs = String::from_utf8_lossy(&chunk);
                 assert_eq!(logs, "123456\n");
-                break;
             }
             chunk => {
                 eprintln!("invalid chunk {chunk:?}");
